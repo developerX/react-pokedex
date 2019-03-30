@@ -1,8 +1,7 @@
 import React, { Component, Fragment } from "react";
-import { Card, Table, Image, Label, Icon } from "semantic-ui-react";
+import { Card, Table, Image, Label, Icon, Statistic } from "semantic-ui-react";
 import Axios from "axios";
 import Species from "../species";
-import Moves from "../moves";
 
 export class Pokemon extends Component {
   state = {
@@ -174,6 +173,14 @@ export class Pokemon extends Component {
             <button onClick={this.previousDescription}>Previous</button>
             <button onClick={this.nextDescription}>next</button>
           </div>
+          <Statistic.Group horizontal>
+            {pokemon.stats.map(({ stat, base_stat }) => (
+              <Statistic key={stat.name}>
+                <Statistic.Value>{base_stat}</Statistic.Value>
+                <Statistic.Label>{stat.name}</Statistic.Label>
+              </Statistic>
+            ))}
+          </Statistic.Group>
         </div>
         <Card fluid>
           <Card.Content>
