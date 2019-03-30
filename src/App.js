@@ -1,26 +1,36 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { Container } from 'semantic-ui-react';
+import Pokemon from './components/pokemon'
 import './App.css';
+import Axios from 'axios';
 
 class App extends Component {
+  state = {
+    search: '1',
+    pokemon: null,
+    language: 'en'
+  }
+
+  searchPokemon = async () => {
+    let pokemon = await Axios.get(`https://pokeapi.co/api/v2/pokemon-species/${this.state.search}`);
+    this.setState({ pokemon: pokemon.data });
+  }
+
+  componentDidMount() {
+    this.searchPokemon();
+  }
+
   render() {
+    const { pokemon, language } = this.state;
+    if (!pokemon) return false; 
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Container>
+        <input type="text" onChange={(e) => this.setState({ search: e.target.value})}/>
+        <Pokemon
+          url={pokemon.varieties.filter(variety => variety.is_default)[0].pokemon.url}
+          descriptions={pokemon.flavor_text_entries.filter(entry => entry.language.name === language)}
+        ></Pokemon>
+      </Container>
     );
   }
 }
