@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Card, Table, Grid } from "semantic-ui-react";
+import { Card, Table, Grid, Button, Header } from "semantic-ui-react";
 import Axios from "axios";
 
 export class Moves extends Component {
@@ -34,7 +34,7 @@ export class Moves extends Component {
   };
 
   render() {
-    const { move } = this.state;
+    const { move, currentMove, moves } = this.state;
     if (!move) return false;
     return (
       <Card fluid>
@@ -43,14 +43,26 @@ export class Moves extends Component {
             <Grid>
               <Grid.Column width={12}>Moves</Grid.Column>
               <Grid.Column width={4} textAlign="right">
-                <button onClick={this.previousMove}>Previous</button>
-                <button onClick={this.nextMove}>Next</button>
+                <Button
+                  content="Previous"
+                  icon="left arrow"
+                  labelPosition="left"
+                  disabled={currentMove === 0}
+                  onClick={this.previousMove}
+                />
+                <Button
+                  content="Next"
+                  icon="right arrow"
+                  labelPosition="right"
+                  disabled={currentMove === moves.length - 1}
+                  onClick={this.nextMove}
+                />
               </Grid.Column>
             </Grid>
           </Card.Header>
         </Card.Content>
         <Card.Content>
-          {move.name}
+          <Header as="h2">{move.name.replace("-", " ").toUpperCase()}</Header>
           {move.effect_entries.map(effect => (
             <p key={move.id}>{effect.effect}</p>
           ))}

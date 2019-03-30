@@ -1,36 +1,34 @@
 import React, { Component, Fragment } from "react";
-import { Card, Table, Image, Label, Icon, Statistic } from "semantic-ui-react";
-import Axios from "axios";
-import Species from "../species";
+import {
+  Image,
+  Label,
+  Icon,
+  Statistic,
+  Grid,
+  Segment,
+  Button
+} from "semantic-ui-react";
 
 export class Pokemon extends Component {
-  state = {
-    pokemon: null,
-    currentMove: 0,
-    name: "",
-    sprites: {},
-    isShiny: false,
-    isBack: false,
-    isFemale: false,
-    onDescription: 0,
-    descriptions: []
-  };
-
-  async componentDidMount() {
-    let pokemon = await Axios.get(this.props.url);
-    // console.warn(pokemon.data);
-    this.setState({
-      pokemon: pokemon.data,
-      sprites: pokemon.data.sprites,
-      descriptions: this.props.descriptions,
-      name: pokemon.data.name,
-      id: pokemon.data.id
-    });
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: props.pokemon.id,
+      pokemon: props.pokemon,
+      currentMove: 0,
+      name: props.pokemon.name,
+      sprites: props.pokemon.sprites,
+      isShiny: false,
+      isBack: false,
+      isFemale: false,
+      onDescription: 0,
+      descriptions: props.descriptions
+    };
   }
 
   renderType = type => {
     let metaInfo = {
-      color: "default",
+      color: "grey",
       iconName: "info"
     };
 
@@ -77,13 +75,21 @@ export class Pokemon extends Component {
         metaInfo.color = "pink";
         metaInfo.iconName = "magic";
         break;
-      default:
+      case "fighting":
+        metaInfo.color = "brown";
+        metaInfo.iconName = "hand rock";
+        break;
+      case "electric":
         metaInfo.color = "yellow";
-        metaInfo.iconName = "lighting";
+        metaInfo.iconName = "lightning";
+        break;
+      default:
+        metaInfo.color = "grey";
+        metaInfo.iconName = "info";
     }
 
     return (
-      <Label color={metaInfo.color} key={type.name}>
+      <Label color={metaInfo.color} key={type.name} size="large">
         <Icon name={metaInfo.iconName} />
         {type.name}
       </Label>
@@ -136,7 +142,6 @@ export class Pokemon extends Component {
 
   render() {
     const {
-      isFemale,
       pokemon,
       name,
       isBack,
@@ -147,75 +152,81 @@ export class Pokemon extends Component {
     if (!pokemon) return false;
     return (
       <Fragment>
-        <div>
-          <h1>{name.toUpperCase()}</h1>
-          <hr />
-          <div className="sprites">
-            <Image src={this.renderSpriteImage()} />
-            <input
-              type="checkbox"
-              checked={isBack}
-              onClick={() => this.setState({ isBack: !isBack })}
-            />{" "}
-            Back
-            <input
-              type="checkbox"
-              checked={isShiny}
-              onClick={() => this.setState({ isShiny: !isShiny })}
-            />{" "}
-            Shiny
-            <input type="checkbox" checked={isFemale} /> Female
-          </div>
-          <div className="description">
-            {descriptions[onDescription].flavor_text}
-          </div>
-          <div className="actions">
-            <button onClick={this.previousDescription}>Previous</button>
-            <button onClick={this.nextDescription}>next</button>
-          </div>
-          <Statistic.Group horizontal>
-            {pokemon.stats.map(({ stat, base_stat }) => (
-              <Statistic key={stat.name}>
-                <Statistic.Value>{base_stat}</Statistic.Value>
-                <Statistic.Label>{stat.name}</Statistic.Label>
-              </Statistic>
-            ))}
-          </Statistic.Group>
-        </div>
-        <Card fluid>
-          <Card.Content>
-            <Card.Header>
-              <Image src={pokemon.sprites.front_default} circular size="tiny" />
-              {pokemon.name}
-            </Card.Header>
-          </Card.Content>
-          <Card.Content>
+        <Grid>
+          <Grid.Column width={12}>
+            <h1>
+              #{pokemon.id} {name.toUpperCase()}
+            </h1>
+          </Grid.Column>
+          <Grid.Column width={4} textAlign="right">
             {pokemon.types.map(({ type }) => this.renderType(type))}
-          </Card.Content>
-          <Card.Content>
-            <Table celled padded>
-              <Table.Header>
-                <Table.Row>
-                  <Table.HeaderCell>ID</Table.HeaderCell>
-                  <Table.HeaderCell>Base Experience</Table.HeaderCell>
-                  <Table.HeaderCell>Height</Table.HeaderCell>
-                  <Table.HeaderCell>Weight</Table.HeaderCell>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell>{pokemon.id}</Table.Cell>
-                  <Table.Cell>{pokemon.base_experience}</Table.Cell>
-                  <Table.Cell>{pokemon.height}</Table.Cell>
-                  <Table.Cell>{pokemon.weight}</Table.Cell>
-                </Table.Row>
-              </Table.Body>
-            </Table>
-          </Card.Content>
-          <Card.Content>
-            <Species pokemon={pokemon.species} />
-          </Card.Content>
-        </Card>
+          </Grid.Column>
+        </Grid>
+        <hr />
+        <Grid>
+          <Grid.Column>
+            <Grid.Row>
+              <Grid>
+                <Grid.Column width={4}>
+                  <div className="sprites">
+                    <Image
+                      src={this.renderSpriteImage()}
+                      style={{ width: "100%" }}
+                    />
+                    <Button
+                      toggle
+                      circular
+                      icon="redo alternate"
+                      active={isBack}
+                      onClick={() => this.setState({ isBack: !isBack })}
+                    />
+                    <Button
+                      floated="right"
+                      circular
+                      toggle
+                      icon="star"
+                      active={isShiny}
+                      onClick={() => this.setState({ isShiny: !isShiny })}
+                    />
+                  </div>
+                </Grid.Column>
+                <Grid.Column width={12}>
+                  <div className="actions">
+                    <Button
+                      content="Previous"
+                      icon="left arrow"
+                      labelPosition="left"
+                      disabled={onDescription === 0}
+                      onClick={this.previousDescription}
+                    />
+                    <Button
+                      floated="right"
+                      content="Next"
+                      icon="right arrow"
+                      labelPosition="right"
+                      disabled={descriptions.length - 1 === onDescription}
+                      onClick={this.nextDescription}
+                    />
+                    <div className="description">
+                      <p>{descriptions[onDescription].flavor_text}</p>
+                    </div>
+                  </div>
+                </Grid.Column>
+              </Grid>
+            </Grid.Row>
+
+            <Segment inverted>
+              <Statistic.Group widths="six" size="tiny">
+                {pokemon.stats.map(({ stat, base_stat }) => (
+                  <Statistic key={stat.name} color="green" inverted>
+                    <Statistic.Value>{base_stat}</Statistic.Value>
+                    <Statistic.Label>{stat.name}</Statistic.Label>
+                  </Statistic>
+                ))}
+              </Statistic.Group>
+            </Segment>
+          </Grid.Column>
+        </Grid>
       </Fragment>
     );
   }

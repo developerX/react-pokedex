@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Grid, Image, Card } from "semantic-ui-react";
+import { Grid, Image, Card, Header } from "semantic-ui-react";
 
 import Axios from "axios";
 
@@ -39,7 +39,7 @@ export class Evolution extends Component {
           <Card.Header>Evolutions</Card.Header>
         </Card.Content>
         <Card.Content>
-          <Grid columns={3}>
+          <Grid columns={3} textAlign="center">
             <Grid.Row>
               {this.state.evolutions.map(pokemon => (
                 <Grid.Column key={pokemon.id}>
@@ -48,7 +48,7 @@ export class Evolution extends Component {
                     size="small"
                     circular
                   />
-                  {pokemon.name}
+                  <Header as="h2">{pokemon.name.toUpperCase()}</Header>
                 </Grid.Column>
               ))}
             </Grid.Row>
